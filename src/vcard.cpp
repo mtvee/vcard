@@ -1,3 +1,20 @@
+/*
+ * vcard: a simple command line search tool for vcard contact file
+ * Copyright (c) 2014 J. Knight
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * ----------------------------------------------------------------------- */
 
 #include <iostream>
 #include <fstream>
@@ -9,18 +26,18 @@
 #include <locale>
 #include <cstdlib>
 
-#include "config.h"
+#include "version.h"
 #include "optparser.h"
 
-/// case insensitive find string
-bool findci(const std::string & strHaystack, const std::string & strNeedle)
+/// case insensitive string found
+bool findci(const std::string & haystack, const std::string & needle)
 {
   auto it = std::search(
-    strHaystack.begin(), strHaystack.end(),
-    strNeedle.begin(),   strNeedle.end(),
+    haystack.begin(), haystack.end(),
+    needle.begin(),   needle.end(),
     [](char ch1, char ch2) { return std::toupper(ch1) == std::toupper(ch2); }
   );
-  if (it != strHaystack.end() ) { 
+  if (it != haystack.end() ) { 
     return true;
   }
   return false;
@@ -29,7 +46,8 @@ bool findci(const std::string & strHaystack, const std::string & strNeedle)
 /**
  * A vcard entry
  *
- * Basically just an attribute map
+ * Basically just an attribute map. We just store the k/v pairs as we
+ * find them.
  */
 class VCardEntry
 {
@@ -42,12 +60,15 @@ class VCardEntry
 
   /// look in all fields, print if found
   bool query( const std::string q, bool print = false );
+
   /// output the record
   void write( std::ostream &out );
-  /// print the record to stdout
+
+  /// print the record to stdout a la mutt (<email><tab><fullname><tab><otherthing>)
   void print();
+
   /// return the actual key for a ci search for key
-  std::string findKey( const std::string key );
+	std::vector<std::string> findKey( const std::string key );
 
   private:
   /// store stuffs
@@ -68,25 +89,34 @@ void VCardEntry::write( std::ostream &out )
 void VCardEntry::print()
 {
   std::stringstream ss;
-  std::string tmp = findKey( "EMAIL" );
+	std::vector<std::string> tmp = findKey( "EMAIL" );
   if( tmp.size() > 0 ) {
-    ss << _attribs[tmp];
-  }
-  ss << "\t";
-  if( _attribs.count("FN")) {
-    ss << _attribs["FN"];
-  }
-  ss << "\t";
-  std::cout << ss.str() << std::endl;
+		for( auto it : tmp ) {
+			ss << _attribs[it];
+			ss << "\t";
+			if( _attribs.count("FN")) {
+				ss << _attribs["FN"];
+			}
+			ss << "\t";
+			tmp = findKey( "TEL" );
+			if( tmp.size() > 0 ) {
+				ss << _attribs[tmp[0]];
+			}
+			std::cout << ss.str() << std::endl;
+			ss.str("");
+		}
+	}
 }
 
-std::string VCardEntry::findKey( const std::string key )
+std::vector<std::string> VCardEntry::findKey( const std::string key )
 {
+	std::vector<std::string> keylist;
+
   for( auto attr : _attribs ) {
     if( findci( attr.first, key ))
-      return attr.first;
+      keylist.push_back( attr.first );
   }
-  return "";
+  return keylist;
 }
 
 
@@ -115,10 +145,13 @@ class VCard
 
   /// load entries from fname
   bool load( const std::string fname );
+
   /// save entries to fname
   bool save( const std::string fname );
+
   /// return number of entries
   int  count() { return _entries.size(); }
+
   /// search all fields for q
   int  query( const std::string q );
 
@@ -208,7 +241,13 @@ void usage()
   std::cout << "\t\tPrint this screen" << std::endl;
   std::cout << "\t-d=DATAFILE | --datafile=DATAFILE" << std::endl;
   std::cout << "\t\tUse DATAFILE for data. Default is $HOME/.vcard/contacts.vcf" << std::endl;
- 
+  std::cout << std::endl;
+	std::cout << "vcard:  Copyright (c) 2014 J. Knight" << std::endl;
+	std::cout << "This program comes with ABSOLUTELY NO WARRANTY!" << std::endl;
+	std::cout << "This is free software, licenced under the GPL v3 and you are" << std::endl;
+	std::cout << "welcome to redistribute it under certain conditions." << std::endl;
+	std::cout << "http://github.com/mtvee/vcard" << std::endl;
+
 	std::cout << std::endl;
 }
 
@@ -261,3 +300,4 @@ int main( int argc, char **argv )
   else
     return 1;
 }
+

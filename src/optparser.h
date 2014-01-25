@@ -1,3 +1,21 @@
+/*
+ * vcard: a simple command line search tool for vcard contact file
+ * Copyright (c) 2014 J. Knight
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * ----------------------------------------------------------------------- */
+
 
 #ifndef __OPTPARSER_H__
 #define __OPTPARSER_H__
@@ -45,10 +63,15 @@ class OptParser
   ~OptParser() {};
 
   /// get/set the program name (argv[0])
+  /// this is done automatically by `parse` so if you
+  /// want to change this, do it after calling `parse`
   string progname() { return pname; };
   void   progname( string name ) { pname = name; }
 
   /// parse c array 
+  /// this expects the first argv[0] to be the program name
+  /// @param argc the argument count
+  /// @param argv the list of pointers to arg values
   bool parse( int argc, char **argv );
   
   /// parse an optlist
@@ -58,13 +81,16 @@ class OptParser
   bool hasopt( string key );
   
   /// return option value or throw exception if 
-  /// the option does not exist
+  /// the option does not exist. Flags will return
+  /// an empty string
   string optval( string key );
   
   /// get arg list
+  /// anything without a '-' in front is treated as an
+  /// arg and returned here.
   optlist getargs() { return args; }
 
-  /// reset
+  /// reset clears ann opts
   void reset();
 
   // debug output to cout

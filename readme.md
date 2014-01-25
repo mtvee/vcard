@@ -30,6 +30,11 @@ You can add the following to your `muttrc`
     set query_command = "vcard '%s'"
     bind editor <Tab> complete-query
 
+Licence
+-------
+
+vcard is licensed under the [GPL3][3]
+
 TODO
 ----
 
@@ -39,4 +44,4 @@ TODO
 
 [1]: http://abook.sourceforge.net/
 [2]: http://rolo.sourceforge.net/
-
+[3]: http://www.gnu.org/licenses/gpl-3.0.txt
