@@ -113,9 +113,13 @@ class VCard
   VCard()  {}
   ~VCard();
 
+  /// load entries from fname
   bool load( const std::string fname );
+  /// save entries to fname
   bool save( const std::string fname );
+  /// return number of entries
   int  count() { return _entries.size(); }
+  /// search all fields for q
   int  query( const std::string q );
 
   private:
@@ -142,7 +146,6 @@ bool VCard::load( const std::string fname )
   std::string line;
   while( std::getline( in, line) ) {
     line.erase(line.find_last_not_of(" \n\r\t")+1);
-    //std::cout << "[" << line << "]" << std::endl;
     std::string key;
     std::string val;
     auto ndx = line.find_first_of( ':' );
@@ -196,10 +199,17 @@ int VCard::query( const std::string q )
 void usage()
 {
   std::cout << "vcard [OPTIONS] [ARGS]" << std::endl;
-  std::cout << "where OPTIONS are:" << std::endl;
-  std::cout << "/t-v | --version" << std::endl;
-  std::cout << "/t/tPrint version info and exit" << std::endl;
-  std::cout << std::endl;
+	std::cout << "any ARGS are run as a query" << std:: endl;
+	std::cout << "\te.g. vcard Smith" << std::endl;
+  std::cout << "OPTIONS are:" << std::endl;
+  std::cout << "\t-v | --version" << std::endl;
+  std::cout << "\t\tPrint version info and exit" << std::endl;
+  std::cout << "\t-h | --help" << std::endl;
+  std::cout << "\t\tPrint this screen" << std::endl;
+  std::cout << "\t-d=DATAFILE | --datafile=DATAFILE" << std::endl;
+  std::cout << "\t\tUse DATAFILE for data. Default is $HOME/.vcard/contacts.vcf" << std::endl;
+ 
+	std::cout << std::endl;
 }
 
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -242,8 +252,8 @@ int main( int argc, char **argv )
 
   int count = 0;
 
-  for( int i = 1; i < argc; i++ ) {
-    count += vc.query( argv[i] );
+  for( auto arg : opt.getargs()) {
+    count += vc.query( arg );
   }
 
   if( count > 0 )

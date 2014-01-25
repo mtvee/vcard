@@ -1,6 +1,42 @@
 vcard
 -----
 
-A simple query utility for an address book saved in vcard format.
+A simple query utility for an address book saved in vcard format. I use this
+from `mutt` in lieu of [abook][1] and [rolo][2].
 
+Requirments
+-----------
+
+- *nix enviroment
+- c++11
+
+Install
+-------
+
+run `make` and put the binary `vcard` somewhere on your path. The binary looks
+for its data file in `$HOME/.vcard/contacts.vcf`. I just export my google
+contacts to this file every once in a while.
+
+Usage
+-----
+
+    vcard --help
+
+Mutt
+----
+
+You can add the following to your `muttrc`
+
+    set query_command = "vcard '%s'"
+    bind editor <Tab> complete-query
+
+TODO
+----
+
+- be able to add/edit/delete records
+
+
+
+[1]: http://abook.sourceforge.net/
+[2]: http://rolo.sourceforge.net/
 
