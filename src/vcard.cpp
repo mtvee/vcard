@@ -29,6 +29,8 @@
 #include "version.h"
 #include "optparser.h"
 
+#define CRLF "\r\n"
+
 /// case insensitive string found
 bool findci(const std::string & haystack, const std::string & needle)
 {
@@ -77,13 +79,15 @@ class VCardEntry
 
 void VCardEntry::write( std::ostream &out )
 {
-  out << "BEGIN:VCARD" << std::endl;
+  out << "BEGIN:VCARD" << CRLF;
+	out << "VERSION:" << _attribs["VERSION"] << CRLF;
 
   for( auto attr : _attribs ) {
-    out << attr.first << ":" << attr.second << std::endl;
+		if( attr.first != "VERSION" )
+			out << attr.first << ":" << attr.second << CRLF;
   }
 
-  out << "END:VCARD" << std::endl;
+  out << "END:VCARD" << CRLF;
 }
 
 void VCardEntry::print()
@@ -176,6 +180,7 @@ bool VCard::load( const std::string fname )
 
   VCardEntry *entry = nullptr;
 
+	// TODO this doesn't handle folded lines properly
   std::string line;
   while( std::getline( in, line) ) {
     line.erase(line.find_last_not_of(" \n\r\t")+1);

@@ -7,7 +7,7 @@ from `mutt` in lieu of [abook][1] and [rolo][2].
 Requirments
 -----------
 
-- *nix enviroment
+- *nix environment
 - c++11
 
 Install
@@ -39,7 +39,7 @@ TODO
 ----
 
 - be able to add/edit/delete records
-
+- folded lines aren't handled properly
 
 
 [1]: http://abook.sourceforge.net/
